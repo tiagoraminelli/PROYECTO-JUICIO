@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notas - Hospital Julio César Villanueva</title>
+<link rel="icon" href="santa fe.webp">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="no-print">
+  <div class="header-inner">
+    <div class="brand">
+      <img src="santa fe.webp" alt="Santa Fe Provincia" class="brand-logo">
+      <div class="brand-text">
+        <h1>Hospital Julio César Villanueva</h1>
+        <p>Generador de Notas — San Cristóbal, Santa Fe</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button onclick="exportarJSON()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Exportar
+      </button>
+      <button onclick="document.getElementById('inputImport').click()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Importar JSON
+      </button>
+      <input type="file" id="inputImport" accept=".json" class="hidden" onchange="importarJSON(event)">
+      <button onclick="vaciarTodo()" class="danger">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        Vaciar
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============================================================
+       CONFIG — datos generales de la nota
+       ============================================================ -->
+  <div class="config no-print">
+    <div class="field">
+      <label>Fecha (automática)</label>
+      <input type="text" id="cfgFecha" readonly style="background:#f9fafb;color:#6b7280;">
+      <div class="help ok" id="fechaHelp">Se toma la fecha del día.</div>
+    </div>
+    <div class="field">
+      <label>Destinatario</label>
+      <input type="text" id="cfgDestinatario" placeholder="Ej: Servicio de Clínica Médica" oninput="actualizarConfig()">
+    </div>
+    <div class="field">
+      <label>Cargo del destinatario</label>
+      <input type="text" id="cfgCargoDest" placeholder="Ej: Jefe de Servicio" oninput="actualizarConfig()">
+    </div>
+    <div class="field">
+      <label>Institución destino</label>
+      <input type="text" id="cfgInstitucion" placeholder="Ej: Hospital San Cristóbal" oninput="actualizarConfig()">
+    </div>
+    <div class="field">
+      <label>Remitente</label>
+      <input type="text" id="cfgRemitente" placeholder="Nombre y apellido" oninput="actualizarConfig()" style="text-transform:uppercase">
+    </div>
+    <div class="field">
+      <label>Cargo del remitente</label>
+      <input type="text" id="cfgCargoRem" placeholder="Ej: Miembro del Consejo Asesor" oninput="actualizarConfig()">
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CUERPO DE LA NOTA
+       ============================================================ -->
+  <div class="panel no-print">
+    <div class="panel-head">
+      <div class="panel-head-left">
+        <h2>Cuerpo de la nota</h2>
+        <span class="indicador-orden" id="contadorItems">0 ítems</span>
+      </div>
+      <button class="primary" onclick="imprimirNota()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir nota
+      </button>
+    </div>
+    <div style="padding:16px;">
+      <label class="nota-label">Motivo</label>
+      <textarea id="notaMotivo" rows="3" placeholder="Ej: Bajo la presente se deja constancia que en el día de la fecha se hace la entrega de los siguientes libros donados por la Municipalidad:"
+                oninput="actualizarNota()" class="nota-textarea"></textarea>
+
+      <label class="nota-label" style="margin-top:18px;">Ítems</label>
+      <div id="notaItemsList" class="nota-items-list"></div>
+      <button class="nota-add-item" onclick="agregarItem()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar ítem
+      </button>
+
+      <label class="nota-label" style="margin-top:18px;">Cierre</label>
+      <textarea id="notaCierre" rows="2" placeholder="Esperando le den utilidad y cuidado a los mismos. Atte."
+                oninput="actualizarNota()" class="nota-textarea"></textarea>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       VISTA PREVIA
+       ============================================================ -->
+  <div class="panel no-print">
+    <div class="panel-head">
+      <div class="panel-head-left">
+        <h2>Vista previa</h2>
+      </div>
+    </div>
+    <div id="previewNota" style="padding:32px 24px;background:#f9fafb;"></div>
+  </div>
+
+  <!-- ZONA DE IMPRESIÓN (oculta en pantalla) -->
+  <div id="zonaImpresion" class="zona-impresion"></div>
+
+  <!-- FOOTER LEGAL -->
+  <footer class="no-print footer-legal">
+    <div class="footer-inner">
+      <div class="footer-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Herramienta de uso interno
+      </div>
+      <h4>Aclaraciones legales y condiciones de uso</h4>
+      <div class="footer-grid">
+        <div>
+          <h5>1. Naturaleza de la herramienta</h5>
+          <p>Este sistema es una <strong>herramienta de asistencia administrativa de uso interno</strong>, desarrollada para facilitar la carga y emisión de notas a partir de datos provistos por el usuario. No constituye un sistema oficial de facturación ni reemplaza los circuitos administrativos, contables o legales vigentes.</p>
+        </div>
+        <div>
+          <h5>2. Responsabilidad del usuario</h5>
+          <p>El usuario es el <strong>único responsable</strong> de la veracidad, exactitud y legalidad de los datos que carga, procesa e imprime. La herramienta no valida la información ingresada, ni verifica su correspondencia con la realidad asistencial, ni controla el cumplimiento de normativas vigentes.</p>
+        </div>
+        <div>
+          <h5>3. Exención de responsabilidad</h5>
+          <p>El/los desarrollador/es de esta herramienta <strong>no asumen responsabilidad alguna</strong> por daños directos, indirectos, incidentales o consecuentes derivados del uso, mal uso, imposibilidad de uso, errores de carga, pérdida de datos o cualquier otro perjuicio que pudiera generarse. El uso de esta herramienta es <strong>exclusiva responsabilidad del usuario</strong>.</p>
+        </div>
+        <div>
+          <h5>4. Datos personales y confidencialidad</h5>
+          <p>Toda la información cargada se procesa <strong>localmente en el navegador del usuario</strong> y no se transmite a servidores externos ni a terceros. El usuario es responsable del resguardo, confidencialidad y tratamiento adecuado de los datos personales, conforme a la <strong>Ley 25.326 de Protección de Datos Personales</strong> y demás normativa aplicable.</p>
+        </div>
+        <div>
+          <h5>5. Uso libre y no comercial</h5>
+          <p>Esta herramienta se distribuye bajo el principio de <strong>uso libre, gratuito y sin garantías</strong>. Se permite su uso, copia, modificación y redistribución total o parcial, siempre que se mantenga esta aclaración legal y se cite la fuente original. <strong>No se autoriza su venta, reventa, sublicenciamiento ni explotación comercial</strong> sin autorización expresa y por escrito del autor.</p>
+        </div>
+        <div>
+          <h5>6. Ausencia de garantías</h5>
+          <p>El software se entrega <strong>"tal cual" ("as is") y "según disponibilidad" ("as available")</strong>, sin garantía de ningún tipo, expresa o implícita. El usuario asume todos los riesgos derivados del uso.</p>
+        </div>
+        <div>
+          <h5>7. Actualizaciones y cambios</h5>
+          <p>El autor podrá modificar, actualizar, suspender o discontinuar la herramienta en cualquier momento y sin previo aviso. Las versiones futuras pueden incluir cambios funcionales, estéticos o legales sin obligación de retrocompatibilidad.</p>
+        </div>
+        <div>
+          <h5>8. Jurisdicción</h5>
+          <p>Cualquier controversia derivada del uso de esta herramienta se regirá por las <strong>leyes de la República Argentina</strong>, con jurisdicción en los tribunales ordinarios de la ciudad de <strong>San Cristóbal, Provincia de Santa Fe</strong>.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p><strong>Versión:</strong> 1.0 &nbsp;·&nbsp; <strong>Última actualización:</strong> 2026 &nbsp;·&nbsp; <strong>Desarrollado para:</strong> Hospital San Cristóbal "Julio Cesar Villanueva"</p>
+        <p class="footer-fine">Al utilizar esta herramienta, el usuario declara haber leído, comprendido y aceptado en su totalidad los términos aquí expuestos.</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

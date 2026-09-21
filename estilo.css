@@ -1,0 +1,578 @@
+/* ============================================================
+   RESET Y BASE
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: #fafafa;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.wrap { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  height: 48px;
+  width: auto;
+  max-width: 180px;
+  flex-shrink: 0;
+  object-fit: contain;
+  display: block;
+}
+.brand-text h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.brand-text p { font-size: 12px; color: #6b7280; margin: 2px 0 0 0; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+button, .btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+button:hover, .btn:hover { background: #f9fafb; border-color: #9ca3af; }
+button.primary { background: #111827; color: #ffffff; border-color: #111827; }
+button.primary:hover { background: #000000; border-color: #000000; }
+button.danger { color: #b91c1c; border-color: #fca5a5; }
+button.danger:hover { background: #fef2f2; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button:disabled:hover { background: #fff; border-color: #d1d5db; }
+.icon { width: 14px; height: 14px; }
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+.config {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+.field input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #ffffff;
+  color: #111827;
+}
+.field input:focus { outline: none; border-color: #111827; }
+.field .help { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+.field .help.ok { color: #059669; }
+
+/* ============================================================
+   PANEL
+   ============================================================ */
+.panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.panel-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.panel-head h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.panel-head-left { display: flex; align-items: center; gap: 12px; }
+.indicador-orden {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   NOTAS — formulario
+   ============================================================ */
+.nota-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.nota-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  resize: vertical;
+  line-height: 1.5;
+}
+.nota-textarea:focus { outline: none; border-color: #111827; }
+
+.nota-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.nota-item-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.nota-item-row .num {
+  width: 26px;
+  text-align: center;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.nota-item-row input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+.nota-item-row input:focus { outline: none; border-color: #111827; }
+.nota-item-row .btn-mini {
+  padding: 4px 7px;
+  font-size: 12px;
+  line-height: 1;
+}
+.nota-add-item {
+  background: #fff;
+  border: 1px dashed #d1d5db;
+  color: #374151;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+.nota-add-item:hover { background: #f9fafb; border-color: #9ca3af; }
+
+/* ============================================================
+   NOTA — documento imprimible
+   ============================================================ */
+.nota-doc {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 40px 48px;
+  font-size: 13px;
+  color: #111827;
+  line-height: 1.65;
+  max-width: 800px;
+  margin: 0 auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.nota-doc * {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Encabezado: Santa Fe arriba-derecha + rosetón centrado */
+.nota-header {
+  position: relative;
+  padding-top: 10px;
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #111827;
+  min-height: 60px;
+}
+.nota-header .logo-santafe {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+.nota-header .logo-hospital {
+  display: block;
+  margin: 0 auto 14px auto;
+  height: 68px;
+  width: auto;
+  object-fit: contain;
+}
+.nota-header h3 {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.06em;
+  color: #111827;
+}
+.nota-header .sub {
+  text-align: center;
+  font-size: 11.5px;
+  color: #6b7280;
+}
+
+/* Cuerpo */
+.nota-lugar {
+  text-align: right;
+  margin: 0 0 28px 0;
+  font-size: 13px;
+  color: #111827;
+}
+
+.nota-destinatario {
+  margin: 0 0 24px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.nota-destinatario p {
+  margin: 0 0 3px 0;
+}
+
+.nota-motivo {
+  margin: 0 0 18px 0;
+  text-align: justify;
+  text-justify: inter-word;
+  font-size: 13px;
+}
+
+.nota-lista {
+  margin: 0 0 20px 0;
+  padding-left: 26px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.nota-lista li {
+  margin-bottom: 5px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.nota-cierre {
+  margin: 20px 0 0 0;
+  font-size: 13px;
+}
+
+.nota-remitente {
+  margin-top: 44px;
+  font-size: 13px;
+}
+.nota-remitente p {
+  margin: 0 0 3px 0;
+}
+.nota-remitente .cargo {
+  font-size: 11.5px;
+  color: #6b7280;
+}
+
+/* Firma */
+.nota-firma {
+  margin-top: 80px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.nota-firma div {
+  border-top: 1px solid #9ca3af;
+  width: 240px;
+  text-align: center;
+  padding-top: 8px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* ============================================================
+   ZONA DE IMPRESIÓN
+   ============================================================ */
+.zona-impresion { display: none; }
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+.hidden { display: none !important; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ============================================================
+   FOOTER LEGAL
+   ============================================================ */
+.footer-legal {
+  margin-top: 48px;
+  padding: 32px 0 24px 0;
+  border-top: 2px solid #e5e7eb;
+  background: transparent;
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+.footer-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+.footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+.footer-badge .icon { width: 13px; height: 13px; }
+.footer-legal h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 18px 0;
+  letter-spacing: -0.01em;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px 28px;
+  margin-bottom: 24px;
+}
+.footer-grid h5 {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.footer-grid p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #4b5563;
+  text-align: justify;
+  text-justify: inter-word;
+}
+.footer-grid strong { color: #111827; font-weight: 600; }
+.footer-bottom {
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 11px;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+.footer-bottom p { margin: 0; }
+.footer-fine {
+  font-style: italic;
+  color: #9ca3af;
+  font-size: 10.5px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-legal { padding: 24px 0 18px 0; }
+  .nota-doc { padding: 24px 18px; }
+  .nota-header .logo-santafe { height: 28px; }
+  .nota-header .logo-hospital { height: 54px; }
+}
+
+/* ============================================================
+   IMPRESIÓN
+   ============================================================ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  html, body {
+    background: #fff !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 11.5pt;
+    color: #000;
+  }
+
+  .no-print,
+  header,
+  .config,
+  .panel-head,
+  .footer-legal { display: none !important; }
+
+  .wrap {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ocultar panels y mostrar solo la zona de impresión */
+  .panel { display: none !important; }
+  #zonaImpresion { display: block !important; }
+
+  .nota-doc {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    color: #000;
+    font-size: 11.5pt;
+    line-height: 1.5;
+    page-break-inside: avoid;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Encabezado */
+  .nota-header {
+    border-bottom: 2px solid #000 !important;
+    padding-top: 0;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    min-height: 0;
+  }
+  .nota-header .logo-santafe {
+    height: 30px !important;
+    top: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .nota-header .logo-hospital {
+    height: 60px !important;
+    margin-bottom: 8px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .nota-header h3 {
+    font-size: 13pt !important;
+    color: #000 !important;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .nota-header .sub {
+    font-size: 9.5pt !important;
+  }
+
+  /* Cuerpo */
+  .nota-lugar {
+    margin-bottom: 20px !important;
+    font-size: 11.5pt !important;
+    text-align: right;
+  }
+  .nota-destinatario {
+    margin-bottom: 18px !important;
+    font-size: 11.5pt !important;
+    line-height: 1.4;
+  }
+  .nota-motivo {
+    margin-bottom: 14px !important;
+    font-size: 11.5pt !important;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+  .nota-lista {
+    font-size: 11.5pt !important;
+    line-height: 1.6 !important;
+    margin-bottom: 16px !important;
+    padding-left: 24px;
+  }
+  .nota-lista li {
+    margin-bottom: 3px;
+    text-align: justify;
+  }
+  .nota-cierre {
+    margin-top: 16px !important;
+    font-size: 11.5pt !important;
+    text-align: justify;
+  }
+  .nota-remitente {
+    margin-top: 36px !important;
+    font-size: 11.5pt !important;
+  }
+  .nota-remitente .cargo {
+    font-size: 10pt;
+  }
+
+  .nota-firma {
+    margin-top: 70px !important;
+    page-break-inside: avoid;
+  }
+  .nota-firma div {
+    width: 220px;
+    font-size: 9.5pt;
+  }
+}
