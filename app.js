@@ -156,7 +156,7 @@ function notaHTML() {
     <div class="nota-doc">
       <div class="nota-header">
         <img src="santa fe.webp" alt="Santa Fe Provincia" class="logo-santafe">
-        <img src="logo-hospital.jpg" alt="Hospital Julio César Villanueva" class="logo-hospital">
+        <img src="logo-hospital-v2.png" alt="Hospital Julio César Villanueva" class="logo-hospital">
         <h3>NOTA</h3>
         <div class="sub"><strong>Hospital Julio César Villanueva</strong> — San Cristóbal</div>
       </div>
