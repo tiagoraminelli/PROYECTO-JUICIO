@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notas - Hospital Julio César Villanueva</title>
-<link rel="icon" href="santa fe.webp">
+<link id="favicon" rel="icon" href="logo-hospital.jpg">
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
@@ -15,22 +15,13 @@
 <header class="no-print">
   <div class="header-inner">
     <div class="brand">
-      <img src="santa fe.webp" alt="Santa Fe Provincia" class="brand-logo">
+      <img id="brandLogo" src="logo-hospital.jpg" alt="Hospital Julio César Villanueva" class="brand-logo">
       <div class="brand-text">
         <h1>Hospital Julio César Villanueva</h1>
         <p>Generador de Notas — San Cristóbal, Santa Fe</p>
       </div>
     </div>
     <div class="actions">
-      <button onclick="exportarJSON()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Exportar
-      </button>
-      <button onclick="document.getElementById('inputImport').click()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Importar JSON
-      </button>
-      <input type="file" id="inputImport" accept=".json" class="hidden" onchange="importarJSON(event)">
       <button onclick="vaciarTodo()" class="danger">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         Vaciar
@@ -42,7 +33,7 @@
 <div class="wrap">
 
   <!-- ============================================================
-       CONFIG — datos generales de la nota
+       CONFIG
        ============================================================ -->
   <div class="config no-print">
     <div class="field">
@@ -50,6 +41,13 @@
       <input type="text" id="cfgFecha" readonly style="background:#f9fafb;color:#6b7280;">
       <div class="help ok" id="fechaHelp">Se toma la fecha del día.</div>
     </div>
+
+    <div class="field">
+      <label>Logo del hospital</label>
+      <select id="cfgLogo" onchange="cambiarLogo(this.value)" class="field-select"></select>
+      <div class="help">Se aplica al header, la nota y el favicon.</div>
+    </div>
+
     <div class="field">
       <label>Destinatario</label>
       <input type="text" id="cfgDestinatario" placeholder="Ej: Servicio de Clínica Médica" oninput="actualizarConfig()">
@@ -73,34 +71,40 @@
   </div>
 
   <!-- ============================================================
-       CUERPO DE LA NOTA
+       CUERPO DE LA NOTA — bloques libres
        ============================================================ -->
   <div class="panel no-print">
     <div class="panel-head">
       <div class="panel-head-left">
         <h2>Cuerpo de la nota</h2>
-        <span class="indicador-orden" id="contadorItems">0 ítems</span>
+        <span class="indicador-orden" id="contadorBloques">0 bloques</span>
       </div>
-      <button class="primary" onclick="imprimirNota()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Imprimir nota
-      </button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="agregarBloque('texto')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          Texto
+        </button>
+        <button onclick="agregarBloque('items')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Lista
+        </button>
+        <button onclick="document.getElementById('inputImg').click()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Imagen
+        </button>
+        <input type="file" id="inputImg" accept="image/*" class="hidden" onchange="subirImagen(event)">
+        <button class="primary" onclick="imprimirNota()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Imprimir nota
+        </button>
+      </div>
     </div>
+
     <div style="padding:16px;">
-      <label class="nota-label">Motivo</label>
-      <textarea id="notaMotivo" rows="3" placeholder="Ej: Bajo la presente se deja constancia que en el día de la fecha se hace la entrega de los siguientes libros donados por la Municipalidad:"
-                oninput="actualizarNota()" class="nota-textarea"></textarea>
-
-      <label class="nota-label" style="margin-top:18px;">Ítems</label>
-      <div id="notaItemsList" class="nota-items-list"></div>
-      <button class="nota-add-item" onclick="agregarItem()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Agregar ítem
-      </button>
-
-      <label class="nota-label" style="margin-top:18px;">Cierre</label>
-      <textarea id="notaCierre" rows="2" placeholder="Esperando le den utilidad y cuidado a los mismos. Atte."
-                oninput="actualizarNota()" class="nota-textarea"></textarea>
+      <div id="bloquesList"></div>
+      <div id="emptyBloques" class="empty-bloques">
+        No hay bloques todavía. Usá los botones de arriba para agregar <strong>Texto</strong>, <strong>Lista</strong> o <strong>Imagen</strong>.
+      </div>
     </div>
   </div>
 
@@ -116,7 +120,7 @@
     <div id="previewNota" style="padding:32px 24px;background:#f9fafb;"></div>
   </div>
 
-  <!-- ZONA DE IMPRESIÓN (oculta en pantalla) -->
+  <!-- ZONA DE IMPRESIÓN -->
   <div id="zonaImpresion" class="zona-impresion"></div>
 
   <!-- FOOTER LEGAL -->

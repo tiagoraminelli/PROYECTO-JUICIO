@@ -576,3 +576,210 @@ button:disabled:hover { background: #fff; border-color: #d1d5db; }
     font-size: 9.5pt;
   }
 }
+
+/* ============================================================
+   SELECTOR DE LOGO
+   ============================================================ */
+.field-select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+}
+.field-select:focus { outline: none; border-color: #111827; }
+
+/* ============================================================
+   SELECTOR
+   ============================================================ */
+.field-select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+}
+.field-select:focus { outline: none; border-color: #111827; }
+
+/* ============================================================
+   BLOQUES — editor
+   ============================================================ */
+.empty-bloques {
+  padding: 24px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12.5px;
+  background: #fafafa;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+}
+
+.bloque {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #fff;
+  transition: border-color .15s;
+}
+.bloque:hover { border-color: #d1d5db; }
+.bloque-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.bloque-tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+}
+.bloque-acciones { display: flex; gap: 4px; }
+.bloque-acciones button {
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.bloque-textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  resize: vertical;
+  line-height: 1.5;
+}
+.bloque-textarea:focus { outline: none; border-color: #111827; }
+
+.bloque-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.bloque-item-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.bloque-item-row .num {
+  width: 24px;
+  text-align: center;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.bloque-item-row input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+.bloque-item-row input:focus { outline: none; border-color: #111827; }
+.bloque-item-row .btn-mini {
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 1;
+}
+.bloque-add-item {
+  background: #fff;
+  border: 1px dashed #d1d5db;
+  color: #374151;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+}
+.bloque-add-item:hover { background: #f9fafb; border-color: #9ca3af; }
+
+/* Bloque imagen */
+.bloque-img-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  margin: 6px 0 8px 0;
+  object-fit: contain;
+}
+.bloque-img-caption {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+  font-style: italic;
+}
+.bloque-img-caption:focus { outline: none; border-color: #111827; }
+
+/* ============================================================
+   NOTA — bloques dentro del documento imprimible
+   ============================================================ */
+.nota-bloque { margin: 0 0 16px 0; }
+.nota-bloque p { margin: 0; }
+
+.nota-bloque.lista { margin: 0 0 18px 0; }
+.nota-bloque.lista ol {
+  margin: 0;
+  padding-left: 26px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.nota-bloque.lista li {
+  margin-bottom: 4px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.nota-bloque.imagen {
+  text-align: center;
+  margin: 18px 0;
+}
+.nota-bloque.imagen img {
+  max-width: 100%;
+  max-height: 90mm;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  object-fit: contain;
+}
+.nota-bloque.imagen .epigrafe {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-style: italic;
+  color: #6b7280;
+}

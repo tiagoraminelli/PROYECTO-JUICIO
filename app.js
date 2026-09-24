@@ -1,5 +1,16 @@
 // ============================================================
-// NOTAS — estado
+// LOGOS DISPONIBLES
+// ============================================================
+const LOGOS_DISPONIBLES = [
+  { archivo: 'logo-hospital.jpg',    nombre: 'Rosetón (color)' },
+  { archivo: 'hospital.png',    nombre: 'Original' },
+  { archivo: 'logo-hospital-v2.png', nombre: 'Escudo Hospital San Cristóbal' },
+];
+
+let logoSeleccionado = 'logo-hospital.jpg';
+
+// ============================================================
+// ESTADO
 // ============================================================
 const nombresMeses = ['','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
@@ -10,9 +21,7 @@ let estadoNota = {
   institucion: 'Hospital San Cristóbal',
   remitente: '',
   cargoRem: '',
-  motivo: '',
-  items: [],
-  cierre: 'Esperando le den utilidad y cuidado a los mismos. Atte.'
+  bloques: []
 };
 
 // ============================================================
@@ -22,7 +31,6 @@ function hoyISO() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
 function formatearFechaLarga(iso) {
   if (!iso) return '';
   const [y,m,d] = iso.split('-');
@@ -31,20 +39,56 @@ function formatearFechaLarga(iso) {
 }
 
 // ============================================================
+// LOGO
+// ============================================================
+function poblarSelectorLogos() {
+  const sel = document.getElementById('cfgLogo');
+  if (!sel) return;
+  sel.innerHTML = LOGOS_DISPONIBLES.map(l =>
+    `<option value="${l.archivo}">${l.nombre}</option>`
+  ).join('');
+  sel.value = logoSeleccionado;
+}
+function cambiarLogo(archivo) {
+  logoSeleccionado = archivo;
+  localStorage.setItem('nota_logo', archivo);
+  aplicarLogo();
+  renderPreview();
+}
+function aplicarLogo() {
+  const brand = document.getElementById('brandLogo');
+  if (brand) brand.src = logoSeleccionado;
+  const fav = document.getElementById('favicon');
+  if (fav) fav.href = logoSeleccionado;
+}
+
+// ============================================================
 // PERSISTENCIA
 // ============================================================
 function guardar() {
-  localStorage.setItem('nota_estado', JSON.stringify(estadoNota));
+  try {
+    localStorage.setItem('nota_estado', JSON.stringify(estadoNota));
+  } catch(e) {
+    alert('No se pudo guardar. Es posible que las imágenes sean demasiado grandes.');
+    console.warn(e);
+  }
 }
-
 function cargar() {
+  const logoGuardado = localStorage.getItem('nota_logo');
+  if (logoGuardado && LOGOS_DISPONIBLES.some(l => l.archivo === logoGuardado)) {
+    logoSeleccionado = logoGuardado;
+  }
+  poblarSelectorLogos();
+  aplicarLogo();
+
   const raw = localStorage.getItem('nota_estado');
   if (raw) {
-    try { estadoNota = { ...estadoNota, ...JSON.parse(raw) }; }
-    catch(e) { console.warn('Error cargando nota', e); }
+    try {
+      const data = JSON.parse(raw);
+      estadoNota = { ...estadoNota, ...data };
+      if (!Array.isArray(estadoNota.bloques)) estadoNota.bloques = [];
+    } catch(e) { console.warn('Error cargando nota', e); }
   }
-
-  // Fecha siempre automática del día
   estadoNota.fecha = hoyISO();
   guardar();
 
@@ -54,10 +98,8 @@ function cargar() {
   document.getElementById('cfgInstitucion').value = estadoNota.institucion || '';
   document.getElementById('cfgRemitente').value = estadoNota.remitente || '';
   document.getElementById('cfgCargoRem').value = estadoNota.cargoRem || '';
-  document.getElementById('notaMotivo').value = estadoNota.motivo || '';
-  document.getElementById('notaCierre').value = estadoNota.cierre || '';
 
-  renderItems();
+  renderBloques();
   renderPreview();
 }
 
@@ -74,73 +116,228 @@ function actualizarConfig() {
   renderPreview();
 }
 
-function actualizarNota() {
-  estadoNota.motivo = document.getElementById('notaMotivo').value;
-  estadoNota.cierre = document.getElementById('notaCierre').value;
-  guardar();
-  renderPreview();
-}
-
 // ============================================================
-// ÍTEMS
+// BLOQUES
 // ============================================================
-function agregarItem(valor = '') {
-  estadoNota.items.push(valor);
+function agregarBloque(tipo) {
+  if (tipo === 'texto') {
+    estadoNota.bloques.push({ tipo: 'texto', contenido: '' });
+  } else if (tipo === 'items') {
+    estadoNota.bloques.push({ tipo: 'items', items: [''] });
+  }
   guardar();
-  renderItems();
+  renderBloques();
   renderPreview();
-  const rows = document.querySelectorAll('#notaItemsList .nota-item-row input');
-  if (rows.length) rows[rows.length - 1].focus();
+  setTimeout(() => {
+    const cont = document.getElementById('bloquesList');
+    const ultimo = cont.lastElementChild;
+    if (!ultimo) return;
+    const campo = ultimo.querySelector('textarea, input');
+    if (campo) campo.focus();
+  }, 50);
 }
 
-function quitarItem(idx) {
-  estadoNota.items.splice(idx, 1);
-  guardar();
-  renderItems();
-  renderPreview();
-}
-
-function actualizarItem(idx, valor) {
-  estadoNota.items[idx] = valor;
-  guardar();
-  renderPreview();
-}
-
-function moverItem(idx, dir) {
-  const n = idx + dir;
-  if (n < 0 || n >= estadoNota.items.length) return;
-  [estadoNota.items[idx], estadoNota.items[n]] = [estadoNota.items[n], estadoNota.items[idx]];
-  guardar();
-  renderItems();
-  renderPreview();
-}
-
-function renderItems() {
-  const cont = document.getElementById('notaItemsList');
-  const contador = document.getElementById('contadorItems');
-  contador.textContent = `${estadoNota.items.length} ítem${estadoNota.items.length === 1 ? '' : 's'}`;
-
-  if (estadoNota.items.length === 0) {
-    cont.innerHTML = '<div style="color:#9ca3af;font-size:12.5px;padding:8px 0;">No hay ítems. Agregá uno con el botón de abajo.</div>';
+function subirImagen(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    alert('El archivo debe ser una imagen.');
     return;
   }
+  if (file.size > 3 * 1024 * 1024) {
+    if (!confirm('La imagen pesa más de 3 MB. Puede hacer lenta la app. ¿Continuar?')) return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    estadoNota.bloques.push({ tipo: 'imagen', src: e.target.result, caption: '' });
+    guardar();
+    renderBloques();
+    renderPreview();
+  };
+  reader.readAsDataURL(file);
+}
 
-  cont.innerHTML = estadoNota.items.map((it, i) => `
-    <div class="nota-item-row">
-      <span class="num">${i + 1}.</span>
-      <input type="text" value="${escapeAttr(it)}" placeholder="Ej: Hacia la belleza, David Foenkinos."
-             oninput="actualizarItem(${i}, this.value)"
-             onkeydown="if(event.key==='Enter'){event.preventDefault();agregarItem();}">
-      <button class="btn-mini" onclick="moverItem(${i}, -1)" title="Subir" ${i === 0 ? 'disabled' : ''}>↑</button>
-      <button class="btn-mini" onclick="moverItem(${i}, 1)" title="Bajar" ${i === estadoNota.items.length - 1 ? 'disabled' : ''}>↓</button>
-      <button class="btn-mini danger" onclick="quitarItem(${i})" title="Quitar">✕</button>
-    </div>
-  `).join('');
+function quitarBloque(idx) {
+  if (!confirm('¿Quitar este bloque?')) return;
+  estadoNota.bloques.splice(idx, 1);
+  guardar();
+  renderBloques();
+  renderPreview();
+}
+
+function moverBloque(idx, dir) {
+  const n = idx + dir;
+  if (n < 0 || n >= estadoNota.bloques.length) return;
+  [estadoNota.bloques[idx], estadoNota.bloques[n]] = [estadoNota.bloques[n], estadoNota.bloques[idx]];
+  guardar();
+  renderBloques();
+  renderPreview();
+}
+
+function actualizarTextoBloque(idx, valor) {
+  estadoNota.bloques[idx].contenido = valor;
+  guardar();
+  renderPreview();
+}
+
+function actualizarCaptionBloque(idx, valor) {
+  estadoNota.bloques[idx].caption = valor;
+  guardar();
+  renderPreview();
+}
+
+// ---------- Ítems dentro de un bloque lista ----------
+function agregarItemBloque(bIdx, valor = '') {
+  estadoNota.bloques[bIdx].items.push(valor);
+  guardar();
+  renderBloques();
+  renderPreview();
+  setTimeout(() => {
+    const rows = document.querySelectorAll(`#bloquesList .bloque[data-idx="${bIdx}"] .bloque-item-row input`);
+    if (rows.length) rows[rows.length - 1].focus();
+  }, 50);
+}
+function quitarItemBloque(bIdx, iIdx) {
+  estadoNota.bloques[bIdx].items.splice(iIdx, 1);
+  guardar();
+  renderBloques();
+  renderPreview();
+}
+function actualizarItemBloque(bIdx, iIdx, valor) {
+  estadoNota.bloques[bIdx].items[iIdx] = valor;
+  guardar();
+  renderPreview();
+}
+function moverItemBloque(bIdx, iIdx, dir) {
+  const arr = estadoNota.bloques[bIdx].items;
+  const n = iIdx + dir;
+  if (n < 0 || n >= arr.length) return;
+  [arr[iIdx], arr[n]] = [arr[n], arr[iIdx]];
+  guardar();
+  renderBloques();
+  renderPreview();
 }
 
 // ============================================================
-// DOCUMENTO
+// RENDER — editor de bloques
 // ============================================================
+function renderBloques() {
+  const cont = document.getElementById('bloquesList');
+  const empty = document.getElementById('emptyBloques');
+  const contador = document.getElementById('contadorBloques');
+
+  contador.textContent = `${estadoNota.bloques.length} bloque${estadoNota.bloques.length === 1 ? '' : 's'}`;
+
+  if (estadoNota.bloques.length === 0) {
+    cont.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  cont.innerHTML = estadoNota.bloques.map((b, i) => {
+    const moverBotones = `
+      <div class="bloque-acciones">
+        <button onclick="moverBloque(${i}, -1)" title="Subir" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button onclick="moverBloque(${i}, 1)" title="Bajar" ${i === estadoNota.bloques.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="danger" onclick="quitarBloque(${i})" title="Quitar">✕</button>
+      </div>
+    `;
+
+    if (b.tipo === 'texto') {
+      return `
+        <div class="bloque" data-idx="${i}">
+          <div class="bloque-head">
+            <span class="bloque-tipo">📝 Texto</span>
+            ${moverBotones}
+          </div>
+          <textarea class="bloque-textarea" placeholder="Escribí el párrafo..."
+                    oninput="actualizarTextoBloque(${i}, this.value)">${escapeHtml(b.contenido || '')}</textarea>
+        </div>
+      `;
+    }
+
+    if (b.tipo === 'items') {
+      const items = (b.items || ['']).map((it, j) => `
+        <div class="bloque-item-row">
+          <span class="num">${j + 1}.</span>
+          <input type="text" value="${escapeAttr(it)}" placeholder="Ej: Hacia la belleza, David Foenkinos."
+                 oninput="actualizarItemBloque(${i}, ${j}, this.value)"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();agregarItemBloque(${i});}">
+          <button class="btn-mini" onclick="moverItemBloque(${i}, ${j}, -1)" title="Subir" ${j === 0 ? 'disabled' : ''}>↑</button>
+          <button class="btn-mini" onclick="moverItemBloque(${i}, ${j}, 1)" title="Bajar" ${j === b.items.length - 1 ? 'disabled' : ''}>↓</button>
+          <button class="btn-mini danger" onclick="quitarItemBloque(${i}, ${j})" title="Quitar">✕</button>
+        </div>
+      `).join('');
+      return `
+        <div class="bloque" data-idx="${i}">
+          <div class="bloque-head">
+            <span class="bloque-tipo">📋 Lista de ítems</span>
+            ${moverBotones}
+          </div>
+          <div class="bloque-items-list">${items || '<div style="color:#9ca3af;font-size:12px;">Sin ítems. Agregá uno abajo.</div>'}</div>
+          <button class="bloque-add-item" onclick="agregarItemBloque(${i})">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar ítem
+          </button>
+        </div>
+      `;
+    }
+
+    if (b.tipo === 'imagen') {
+      return `
+        <div class="bloque" data-idx="${i}">
+          <div class="bloque-head">
+            <span class="bloque-tipo">🖼️ Imagen</span>
+            ${moverBotones}
+          </div>
+          <img src="${b.src}" alt="Adjunto" class="bloque-img-preview">
+          <input type="text" class="bloque-img-caption" value="${escapeAttr(b.caption || '')}"
+                 placeholder="Epígrafe (opcional)"
+                 oninput="actualizarCaptionBloque(${i}, this.value)">
+        </div>
+      `;
+    }
+
+    return '';
+  }).join('');
+}
+
+// ============================================================
+// DOCUMENTO — render imprimible
+// ============================================================
+function bloquesHTML() {
+  return estadoNota.bloques.map(b => {
+    if (b.tipo === 'texto') {
+      const txt = (b.contenido || '').trim();
+      if (!txt) return '';
+      return `<div class="nota-bloque texto"><p>${escapeHtml(txt).replace(/\n/g, '<br>')}</p></div>`;
+    }
+    if (b.tipo === 'items') {
+      const items = (b.items || []).filter(i => i && i.trim());
+      if (!items.length) return '';
+      return `
+        <div class="nota-bloque lista">
+          <ol>
+            ${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
+          </ol>
+        </div>
+      `;
+    }
+    if (b.tipo === 'imagen') {
+      if (!b.src) return '';
+      return `
+        <div class="nota-bloque imagen">
+          <img src="${b.src}" alt="Adjunto">
+          ${b.caption ? `<span class="epigrafe">${escapeHtml(b.caption)}</span>` : ''}
+        </div>
+      `;
+    }
+    return '';
+  }).join('');
+}
+
 function notaHTML() {
   const fechaLarga = estadoNota.fecha ? formatearFechaLarga(estadoNota.fecha) : '—';
   const destinatario = estadoNota.destinatario || '___________________';
@@ -148,15 +345,12 @@ function notaHTML() {
   const institucion = estadoNota.institucion || 'Hospital San Cristóbal';
   const remitente = estadoNota.remitente || '___________________';
   const cargoRem = estadoNota.cargoRem || '';
-  const motivo = estadoNota.motivo || '';
-  const cierre = estadoNota.cierre || '';
-  const items = estadoNota.items.filter(i => i && i.trim());
 
   return `
     <div class="nota-doc">
       <div class="nota-header">
         <img src="santa fe.webp" alt="Santa Fe Provincia" class="logo-santafe">
-        <img src="logo-hospital-v2.png" alt="Hospital Julio César Villanueva" class="logo-hospital">
+        <img src="${logoSeleccionado}" alt="Hospital Julio César Villanueva" class="logo-hospital">
         <h3>NOTA</h3>
         <div class="sub"><strong>Hospital Julio César Villanueva</strong> — San Cristóbal</div>
       </div>
@@ -168,15 +362,7 @@ function notaHTML() {
         <p>${escapeHtml(institucion)}</p>
       </div>
 
-      ${motivo ? `<p class="nota-motivo">${escapeHtml(motivo)}</p>` : ''}
-
-      ${items.length ? `
-        <ol class="nota-lista">
-          ${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
-        </ol>
-      ` : ''}
-
-      ${cierre ? `<p class="nota-cierre">${escapeHtml(cierre)}</p>` : ''}
+      ${bloquesHTML()}
 
       <div class="nota-remitente">
         <p><strong>${escapeHtml(remitente)}</strong></p>
@@ -200,7 +386,6 @@ function renderPreview() {
 // IMPRESIÓN
 // ============================================================
 function imprimirNota() {
-  // Refrescar fecha al momento de imprimir
   estadoNota.fecha = hoyISO();
   guardar();
   document.getElementById('cfgFecha').value = formatearFechaLarga(estadoNota.fecha);
@@ -211,7 +396,7 @@ function imprimirNota() {
 }
 
 // ============================================================
-// VACIAR / EXPORTAR / IMPORTAR
+// VACIAR
 // ============================================================
 function vaciarTodo() {
   if (!confirm('¿Vaciar la nota actual? Esta acción no se puede deshacer.')) return;
@@ -222,42 +407,10 @@ function vaciarTodo() {
     institucion: 'Hospital San Cristóbal',
     remitente: '',
     cargoRem: '',
-    motivo: '',
-    items: [],
-    cierre: 'Esperando le den utilidad y cuidado a los mismos. Atte.'
+    bloques: []
   };
   guardar();
   cargar();
-}
-
-function exportarJSON() {
-  const data = JSON.stringify(estadoNota, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const nombre = estadoNota.fecha ? estadoNota.fecha.replace(/-/g,'') : 'sin_fecha';
-  a.href = url;
-  a.download = `nota_${nombre}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importarJSON(event) {
-  const file = event.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data || typeof data !== 'object') throw new Error('Formato inválido');
-      estadoNota = { ...estadoNota, ...data };
-      estadoNota.fecha = hoyISO(); // siempre fecha del día
-      guardar();
-      cargar();
-      alert('✅ Nota importada.');
-    } catch(err) { alert('Error al importar: ' + err.message); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
 }
 
 // ============================================================
