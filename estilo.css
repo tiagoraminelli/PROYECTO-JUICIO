@@ -294,28 +294,10 @@ button:disabled:hover { background: #fff; border-color: #d1d5db; }
   margin: 0 0 3px 0;
 }
 
-.nota-motivo {
+.nota-bloque.texto p {
   margin: 0 0 18px 0;
   text-align: justify;
   text-justify: inter-word;
-  font-size: 13px;
-}
-
-.nota-lista {
-  margin: 0 0 20px 0;
-  padding-left: 26px;
-  font-size: 13px;
-  line-height: 1.75;
-}
-.nota-lista li {
-  margin-bottom: 5px;
-  text-align: justify;
-  text-justify: inter-word;
-}
-
-.nota-cierre {
-  margin: 20px 0 0 0;
-  font-size: 13px;
 }
 
 .nota-remitente {
@@ -492,9 +474,16 @@ button:disabled:hover { background: #fff; border-color: #d1d5db; }
     color: #000;
     font-size: 11.5pt;
     line-height: 1.5;
-    page-break-inside: avoid;
     word-wrap: break-word;
     overflow-wrap: break-word;
+  }
+
+  /* Solo evitar cortes DENTRO de bloques concretos */
+  .nota-bloque {
+    page-break-inside: avoid;
+  }
+  .nota-bloque.texto {
+    page-break-inside: auto;
   }
 
   /* Encabezado */
@@ -538,26 +527,30 @@ button:disabled:hover { background: #fff; border-color: #d1d5db; }
     font-size: 11.5pt !important;
     line-height: 1.4;
   }
-  .nota-motivo {
+  .nota-bloque.texto p {
     margin-bottom: 14px !important;
     font-size: 11.5pt !important;
     text-align: justify;
     text-justify: inter-word;
   }
-  .nota-lista {
+  .nota-bloque.lista ol {
     font-size: 11.5pt !important;
     line-height: 1.6 !important;
     margin-bottom: 16px !important;
     padding-left: 24px;
   }
-  .nota-lista li {
+  .nota-bloque.lista li {
     margin-bottom: 3px;
     text-align: justify;
   }
-  .nota-cierre {
-    margin-top: 16px !important;
-    font-size: 11.5pt !important;
-    text-align: justify;
+  .nota-bloque.imagen img {
+    max-width: 100%;
+    max-height: 90mm;
+    object-fit: contain;
+  }
+  .nota-bloque.imagen .epigrafe {
+    font-size: 10pt;
+    font-style: italic;
   }
   .nota-remitente {
     margin-top: 36px !important;

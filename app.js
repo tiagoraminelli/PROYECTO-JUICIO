@@ -68,10 +68,32 @@ function aplicarLogo() {
 function guardar() {
   try {
     localStorage.setItem('nota_estado', JSON.stringify(estadoNota));
+    return true;
   } catch(e) {
-    alert('No se pudo guardar. Es posible que las imágenes sean demasiado grandes.');
-    console.warn(e);
+    console.warn('No se pudo guardar en localStorage', e);
+    return false;
   }
+}
+
+// Comprime una imagen (dataURL) si supera maxDim píxeles de lado.
+function comprimirImagen(dataUrl, maxDim = 1600, calidad = 0.85) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (Math.max(w, h) <= maxDim) return resolve(dataUrl);
+      const scale = maxDim / Math.max(w, h);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', calidad));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
 }
 function cargar() {
   const logoGuardado = localStorage.getItem('nota_logo');
@@ -149,9 +171,20 @@ function subirImagen(event) {
     if (!confirm('La imagen pesa más de 3 MB. Puede hacer lenta la app. ¿Continuar?')) return;
   }
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     estadoNota.bloques.push({ tipo: 'imagen', src: e.target.result, caption: '' });
-    guardar();
+    if (!guardar()) {
+      // Cuota de localStorage excedida: intentar con la imagen comprimida
+      const idx = estadoNota.bloques.length - 1;
+      estadoNota.bloques[idx].src = await comprimirImagen(estadoNota.bloques[idx].src);
+      if (!guardar()) {
+        estadoNota.bloques.pop();
+        alert('La imagen es demasiado grande para guardarse en el navegador. Probá con una más chica o en formato JPG.');
+        renderBloques();
+        renderPreview();
+        return;
+      }
+    }
     renderBloques();
     renderPreview();
   };
@@ -249,7 +282,7 @@ function renderBloques() {
       return `
         <div class="bloque" data-idx="${i}">
           <div class="bloque-head">
-            <span class="bloque-tipo">📝 Texto</span>
+            <span class="bloque-tipo">Texto</span>
             ${moverBotones}
           </div>
           <textarea class="bloque-textarea" placeholder="Escribí el párrafo..."
@@ -273,7 +306,7 @@ function renderBloques() {
       return `
         <div class="bloque" data-idx="${i}">
           <div class="bloque-head">
-            <span class="bloque-tipo">📋 Lista de ítems</span>
+            <span class="bloque-tipo">Lista de ítems</span>
             ${moverBotones}
           </div>
           <div class="bloque-items-list">${items || '<div style="color:#9ca3af;font-size:12px;">Sin ítems. Agregá uno abajo.</div>'}</div>
@@ -289,7 +322,7 @@ function renderBloques() {
       return `
         <div class="bloque" data-idx="${i}">
           <div class="bloque-head">
-            <span class="bloque-tipo">🖼️ Imagen</span>
+            <span class="bloque-tipo">Imagen</span>
             ${moverBotones}
           </div>
           <img src="${b.src}" alt="Adjunto" class="bloque-img-preview">
@@ -392,7 +425,14 @@ function imprimirNota() {
 
   const zona = document.getElementById('zonaImpresion');
   zona.innerHTML = notaHTML();
-  setTimeout(() => window.print(), 150);
+
+  // Esperar a que todas las imágenes terminen de cargar antes de imprimir
+  const imgs = Array.from(zona.querySelectorAll('img'));
+  const cargadas = imgs.map(img => img.complete
+    ? Promise.resolve()
+    : new Promise(res => { img.onload = img.onerror = res; })
+  );
+  Promise.all(cargadas).then(() => setTimeout(() => window.print(), 100));
 }
 
 // ============================================================
